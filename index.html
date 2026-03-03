@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NORTHEAST CRICKET PREMIER LEAGUE (NCPL)</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#111;color:#fff}
+header{background:#000;padding:20px;text-align:center;font-size:22px;font-weight:bold}
+section{padding:40px 20px;text-align:center}
+.card{max-width:700px;margin:auto;background:#1a1a1a;padding:20px;border-radius:8px;margin-bottom:20px}
+input,button,select{width:100%;padding:10px;margin:8px 0;border-radius:5px;border:none}
+button{background:#28a745;color:white;cursor:pointer}
+button.red{background:red}
+button.blue{background:#007bff}
+.whatsapp{position:fixed;bottom:20px;right:20px;background:#25D366;padding:12px;border-radius:50%;color:white;text-decoration:none}
+#adminPanel{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#111;overflow:auto;padding:20px;z-index:9999}
+table{width:100%;border-collapse:collapse}
+td,th{border:1px solid #333;padding:8px;font-size:12px}
+</style>
+</head>
+<body>
+
+<header>🏏 NORTHEAST CRICKET PREMIER LEAGUE (NCPL)</header>
+
+<section>
+<div class="card">
+<h3>Registration Rules</h3>
+<p>Age: 16-40</p>
+<p>Fee: ₹500 (Non-refundable)</p>
+<p>Trial Location: Guwahati, Assam</p>
+</div>
+</section>
+
+<section>
+<div class="card">
+<h3>Payment (Scan & Pay)</h3>
+<p>UPI ID: yourupi@bank</p>
+<img src="qr.png" width="200">
+</div>
+</section>
+
+<section>
+<div class="card">
+<h3>Player Registration</h3>
+<div id="regStatus"></div>
+<form id="regForm">
+<input type="text" id="name" placeholder="Full Name" required>
+<input type="number" id="age" placeholder="Age 16-40" min="16" max="40" required>
+<input type="text" id="role" placeholder="Playing Role" required>
+<input type="text" id="city" placeholder="City" required>
+<input type="tel" id="mobile" placeholder="10 Digit Mobile" pattern="[0-9]{10}" required>
+<input type="file" id="screenshot" accept="image/*" required>
+<button type="submit">Submit Registration</button>
+</form>
+<p>Total Registrations: <span id="counter">0</span></p>
+</div>
+</section>
+
+<section>
+<div class="card">
+<h3>Approved Players</h3>
+<div id="approvedList"></div>
+</div>
+</section>
+
+<section>
+<div class="card">
+<h3>Latest Result</h3>
+<div id="resultSection">Result Not Announced</div>
+</div>
+</section>
+
+<a href="https://wa.me/917520947031" class="whatsapp">💬</a>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+<h2>Admin Dashboard</h2>
+
+<div class="card">
+<button class="blue" onclick="toggleEntry()">Toggle Entry Open/Close</button>
+<button onclick="downloadCSV()">Download CSV</button>
+<button class="red" onclick="resetData()">Reset All Data</button>
+</div>
+
+<div class="card">
+<h3>Update Result</h3>
+<input type="text" id="resultInput" placeholder="Enter Result">
+<button onclick="updateResult()">Update</button>
+</div>
+
+<div class="card">
+<h3>All Registrations</h3>
+<div id="adminList"></div>
+</div>
+
+<button class="red" onclick="closeAdmin()">Close</button>
+</div>
+
+<script>
+
+let registrations = JSON.parse(localStorage.getItem("regs")||"[]");
+let approved = JSON.parse(localStorage.getItem("approved")||"[]");
+let entryOpen = localStorage.getItem("entryOpen");
+if(entryOpen===null){ entryOpen="true"; localStorage.setItem("entryOpen","true"); }
+
+function saveData(){
+localStorage.setItem("regs",JSON.stringify(registrations));
+localStorage.setItem("approved",JSON.stringify(approved));
+}
+
+function updateCounter(){
+document.getElementById("counter").innerText = registrations.length;
+}
+
+function loadApproved(){
+let html="";
+approved.forEach(p=>{
+html+=`<p>${p.name} (${p.role})</p>`;
+});
+document.getElementById("approvedList").innerHTML=html;
+}
+
+function loadAdmin(){
+let html="<table><tr><th>Name</th><th>Mobile</th><th>Action</th></tr>";
+registrations.forEach((p,i)=>{
+html+=`<tr>
+<td>${p.name}</td>
+<td>${p.mobile}</td>
+<td>
+<button onclick="approve(${i})">Approve</button>
+<button class="red" onclick="reject(${i})">Reject</button>
+</td>
+</tr>`;
+});
+html+="</table>";
+document.getElementById("adminList").innerHTML=html;
+}
+
+document.getElementById("regForm").onsubmit=function(e){
+e.preventDefault();
+
+if(localStorage.getItem("entryOpen")==="false"){
+alert("Registration Closed");
+return;
+}
+
+let name=document.getElementById("name").value;
+let age=document.getElementById("age").value;
+let role=document.getElementById("role").value;
+let city=document.getElementById("city").value;
+let mobile=document.getElementById("mobile").value;
+let screenshot=document.getElementById("screenshot").files[0];
+
+if(registrations.some(p=>p.mobile===mobile)){
+alert("Mobile number already registered");
+return;
+}
+
+let reader=new FileReader();
+reader.onload=function(){
+registrations.push({name,age,role,city,mobile,img:reader.result});
+saveData();
+updateCounter();
+loadAdmin();
+alert("Registration Submitted");
+document.getElementById("regForm").reset();
+}
+reader.readAsDataURL(screenshot);
+}
+
+function approve(i){
+approved.push(registrations[i]);
+registrations.splice(i,1);
+saveData();
+loadAdmin();
+loadApproved();
+updateCounter();
+}
+
+function reject(i){
+registrations.splice(i,1);
+saveData();
+loadAdmin();
+updateCounter();
+}
+
+function toggleEntry(){
+entryOpen = (localStorage.getItem("entryOpen")==="true")?"false":"true";
+localStorage.setItem("entryOpen",entryOpen);
+alert("Entry Status: "+entryOpen);
+}
+
+function updateResult(){
+let r=document.getElementById("resultInput").value;
+localStorage.setItem("result",r);
+document.getElementById("resultSection").innerText=r;
+}
+
+function downloadCSV(){
+let csv="Name,Age,Role,City,Mobile\n";
+registrations.forEach(p=>{
+csv+=`${p.name},${p.age},${p.role},${p.city},${p.mobile}\n`;
+});
+let blob=new Blob([csv],{type:"text/csv"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="registrations.csv";
+a.click();
+}
+
+function resetData(){
+if(confirm("Are you sure?")){
+localStorage.clear();
+location.reload();
+}
+}
+
+function closeAdmin(){
+document.getElementById("adminPanel").style.display="none";
+}
+
+if(window.location.hash==="#admin2026"){
+let pass=prompt("Enter Admin Password");
+if(pass==="admin@123"){
+document.getElementById("adminPanel").style.display="block";
+loadAdmin();
+}else{
+alert("Wrong Password");
+window.location.href=window.location.pathname;
+}
+}
+
+updateCounter();
+loadApproved();
+let savedResult=localStorage.getItem("result");
+if(savedResult){ document.getElementById("resultSection").innerText=savedResult; }
+
+</script>
+
+</body>
+  </html>
