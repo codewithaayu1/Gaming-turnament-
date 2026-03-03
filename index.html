@@ -3,241 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NORTHEAST CRICKET PREMIER LEAGUE (NCPL)</title>
+<title>NCPL - NORTHEAST CRICKET PREMIER LEAGUE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{margin:0;font-family:Arial;background:#111;color:#fff}
-header{background:#000;padding:20px;text-align:center;font-size:22px;font-weight:bold}
-section{padding:40px 20px;text-align:center}
-.card{max-width:700px;margin:auto;background:#1a1a1a;padding:20px;border-radius:8px;margin-bottom:20px}
-input,button,select{width:100%;padding:10px;margin:8px 0;border-radius:5px;border:none}
-button{background:#28a745;color:white;cursor:pointer}
-button.red{background:red}
-button.blue{background:#007bff}
-.whatsapp{position:fixed;bottom:20px;right:20px;background:#25D366;padding:12px;border-radius:50%;color:white;text-decoration:none}
-#adminPanel{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#111;overflow:auto;padding:20px;z-index:9999}
-table{width:100%;border-collapse:collapse}
-td,th{border:1px solid #333;padding:8px;font-size:12px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+body{background:linear-gradient(135deg,#0f172a,#020617);color:white;overflow-x:hidden}
+section{padding:60px 8%}
+h1,h2{text-align:center}
+h2{margin-bottom:25px;color:#38bdf8}
+.card{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);
+border:1px solid rgba(255,255,255,0.1);padding:25px;border-radius:15px;margin-bottom:20px}
+input,button{padding:10px;border-radius:8px;border:none;margin-top:8px}
+input{width:100%;background:#0f172a;border:1px solid #334155;color:white}
+button{background:#38bdf8;color:black;font-weight:600;cursor:pointer}
+.hidden{display:none}
+.hero{padding:120px 10%;text-align:center;background:radial-gradient(circle,#1e3a8a,#0f172a)}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:999}
+.close{position:absolute;top:20px;right:30px;font-size:28px;cursor:pointer}
+.badge{background:#16a34a;padding:4px 8px;border-radius:5px;font-size:12px}
 </style>
 </head>
 <body>
 
-<header>🏏 NORTHEAST CRICKET PREMIER LEAGUE (NCPL)</header>
-
-<section>
-<div class="card">
-<h3>Registration Rules</h3>
-<p>Age: 16-40</p>
-<p>Fee: ₹500 (Non-refundable)</p>
-<p>Trial Location: Guwahati, Assam</p>
+<div class="hero">
+<h1>🏏 NORTHEAST CRICKET PREMIER LEAGUE (NCPL)</h1>
+<p>Official Cricket Trials Platform - 2026</p>
+<button onclick="scrollToForm()">Register Now</button>
 </div>
-</section>
 
-<section>
+<section id="registerSection">
+<h2>Player Registration</h2>
+
 <div class="card">
-<h3>Payment (Scan & Pay)</h3>
-<p>UPI ID: yourupi@bank</p>
-<img src="qr.png" width="200">
+<p>Total Registrations: <span id="regCount">0</span></p>
+<p id="entryStatus">Entries Open</p>
 </div>
-</section>
 
-<section>
 <div class="card">
-<h3>Player Registration</h3>
-<div id="regStatus"></div>
 <form id="regForm">
 <input type="text" id="name" placeholder="Full Name" required>
-<input type="number" id="age" placeholder="Age 16-40" min="16" max="40" required>
-<input type="text" id="role" placeholder="Playing Role" required>
-<input type="text" id="city" placeholder="City" required>
-<input type="tel" id="mobile" placeholder="10 Digit Mobile" pattern="[0-9]{10}" required>
+<input type="number" id="age" placeholder="Age" required>
+<input type="tel" id="mobile" placeholder="Mobile Number" maxlength="10" required>
+
+<label>Upload Photo</label>
+<input type="file" id="photo" accept="image/*" required>
+<img id="photoPreview" style="width:100px;margin-top:10px;display:none;border-radius:50%;">
+
+<label>Upload Payment Screenshot</label>
 <input type="file" id="screenshot" accept="image/*" required>
+<img id="shotPreview" style="width:120px;margin-top:10px;display:none;border-radius:8px;">
+
 <button type="submit">Submit Registration</button>
 </form>
-<p>Total Registrations: <span id="counter">0</span></p>
+<p id="formMsg" style="margin-top:15px;"></p>
 </div>
 </section>
-
-<section>
-<div class="card">
-<h3>Approved Players</h3>
-<div id="approvedList"></div>
-</div>
-</section>
-
-<section>
-<div class="card">
-<h3>Latest Result</h3>
-<div id="resultSection">Result Not Announced</div>
-</div>
-</section>
-
-<a href="https://wa.me/917520947031" class="whatsapp">💬</a>
 
 <!-- ADMIN PANEL -->
-<div id="adminPanel">
-<h2>Admin Dashboard</h2>
+<div id="adminPanel" class="modal hidden">
+<div class="card" style="width:95%;max-height:90vh;overflow:auto;position:relative;">
+<span class="close" onclick="closeAdmin()">×</span>
 
-<div class="card">
-<button class="blue" onclick="toggleEntry()">Toggle Entry Open/Close</button>
+<h2>Admin Login</h2>
+<div id="loginBox">
+<input type="password" id="adminPass" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+</div>
+
+<div id="adminContent" class="hidden">
+<button onclick="toggleEntry()">Toggle Entry</button>
 <button onclick="downloadCSV()">Download CSV</button>
-<button class="red" onclick="resetData()">Reset All Data</button>
-</div>
-
-<div class="card">
-<h3>Update Result</h3>
-<input type="text" id="resultInput" placeholder="Enter Result">
-<button onclick="updateResult()">Update</button>
-</div>
-
-<div class="card">
-<h3>All Registrations</h3>
+<button onclick="resetAll()" style="background:red;color:white;">Reset All</button>
 <div id="adminList"></div>
 </div>
-
-<button class="red" onclick="closeAdmin()">Close</button>
 </div>
+</div>
+
+<!-- ID CARD -->
+<div id="idCardModal" class="modal hidden">
+<div class="card" style="width:350px;text-align:center;position:relative;">
+<span class="close" onclick="closeID()">×</span>
+
+<div id="idCardDesign" style="background:linear-gradient(135deg,#0f172a,#1e40af);
+border-radius:20px;padding:20px;position:relative;">
+
+<h3>🏏 NCPL 2026</h3>
+<img id="idPhoto" style="width:100px;height:100px;border-radius:50%;
+border:3px solid #38bdf8;object-fit:cover;">
+<h2 id="idName"></h2>
+<p id="idPlayerID"></p>
+<p id="idMobile"></p>
+
+<div id="verifiedBadge" class="badge hidden">✔ VERIFIED</div>
+<div id="qrCode" style="margin-top:10px;"></div>
+</div>
+
+<br>
+<button onclick="downloadID()">Download PNG</button>
+<button onclick="downloadPDF()">Download PDF</button>
+
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
-let registrations = JSON.parse(localStorage.getItem("regs")||"[]");
-let approved = JSON.parse(localStorage.getItem("approved")||"[]");
-let entryOpen = localStorage.getItem("entryOpen");
-if(entryOpen===null){ entryOpen="true"; localStorage.setItem("entryOpen","true"); }
-
-function saveData(){
-localStorage.setItem("regs",JSON.stringify(registrations));
-localStorage.setItem("approved",JSON.stringify(approved));
-}
+let data = JSON.parse(localStorage.getItem("ncplData")) || [];
+let entryOpen = true;
 
 function updateCounter(){
-document.getElementById("counter").innerText = registrations.length;
+regCount.innerText = data.length;
+localStorage.setItem("ncplData", JSON.stringify(data));
+}
+updateCounter();
+
+photo.onchange=e=>{
+let r=new FileReader();
+r.onload=()=>{photoPreview.src=r.result;photoPreview.style.display="block";}
+r.readAsDataURL(e.target.files[0]);
+};
+
+screenshot.onchange=e=>{
+let r=new FileReader();
+r.onload=()=>{shotPreview.src=r.result;shotPreview.style.display="block";}
+r.readAsDataURL(e.target.files[0]);
+};
+
+regForm.onsubmit=e=>{
+e.preventDefault();
+
+if(!entryOpen){formMsg.innerHTML="Entries Closed";return;}
+
+let player={
+id:Date.now(),
+playerID:"NCPL2026-"+Math.floor(1000+Math.random()*9000),
+name:name.value,
+age:age.value,
+mobile:mobile.value,
+photo:photoPreview.src,
+screenshot:shotPreview.src,
+status:"Pending",
+verified:false
+};
+
+data.push(player);
+updateCounter();
+
+formMsg.innerHTML="<span style='color:lightgreen'>Registration Successful ✅</span>";
+regForm.reset();
+photoPreview.style.display="none";
+shotPreview.style.display="none";
+};
+
+if(window.location.hash==="#ncpladmin"){
+adminPanel.classList.remove("hidden");
 }
 
-function loadApproved(){
-let html="";
-approved.forEach(p=>{
-html+=`<p>${p.name} (${p.role})</p>`;
-});
-document.getElementById("approvedList").innerHTML=html;
+function closeAdmin(){adminPanel.classList.add("hidden");}
+
+function adminLogin(){
+if(adminPass.value==="admin2026"){
+loginBox.classList.add("hidden");
+adminContent.classList.remove("hidden");
+loadAdmin();
+}
 }
 
 function loadAdmin(){
-let html="<table><tr><th>Name</th><th>Mobile</th><th>Action</th></tr>";
-registrations.forEach((p,i)=>{
-html+=`<tr>
-<td>${p.name}</td>
-<td>${p.mobile}</td>
-<td>
-<button onclick="approve(${i})">Approve</button>
-<button class="red" onclick="reject(${i})">Reject</button>
-</td>
-</tr>`;
+adminList.innerHTML="";
+data.forEach(p=>{
+adminList.innerHTML+=`
+<div class="card">
+<p><b>${p.name}</b> (${p.status})</p>
+<button onclick="approve(${p.id})">Approve</button>
+<button onclick="openID(${p.id})">Open ID</button>
+</div>`;
 });
-html+="</table>";
-document.getElementById("adminList").innerHTML=html;
 }
 
-document.getElementById("regForm").onsubmit=function(e){
-e.preventDefault();
-
-if(localStorage.getItem("entryOpen")==="false"){
-alert("Registration Closed");
-return;
+function approve(id){
+data=data.map(p=>{
+if(p.id===id){
+p.status="Approved";
+let msg="Congratulations "+p.name+"! Your NCPL ID Approved. ID: "+p.playerID;
+window.open("https://wa.me/91"+p.mobile+"?text="+encodeURIComponent(msg));
+}
+return p;
+});
+updateCounter();loadAdmin();
 }
 
-let name=document.getElementById("name").value;
-let age=document.getElementById("age").value;
-let role=document.getElementById("role").value;
-let city=document.getElementById("city").value;
-let mobile=document.getElementById("mobile").value;
-let screenshot=document.getElementById("screenshot").files[0];
+function openID(id){
+let p=data.find(x=>x.id===id);
+idCardModal.classList.remove("hidden");
+idPhoto.src=p.photo;
+idName.innerText=p.name;
+idPlayerID.innerText="ID: "+p.playerID;
+idMobile.innerText="Mobile: "+p.mobile;
 
-if(registrations.some(p=>p.mobile===mobile)){
-alert("Mobile number already registered");
-return;
+qrCode.innerHTML="";
+let link=window.location.origin+window.location.pathname+"?verify="+p.playerID;
+new QRCode(qrCode,{text:link,width:90,height:90});
 }
 
-let reader=new FileReader();
-reader.onload=function(){
-registrations.push({name,age,role,city,mobile,img:reader.result});
-saveData();
-updateCounter();
-loadAdmin();
-alert("Registration Submitted");
-document.getElementById("regForm").reset();
-}
-reader.readAsDataURL(screenshot);
+function closeID(){idCardModal.classList.add("hidden");}
+
+function downloadID(){
+html2canvas(idCardDesign,{scale:3}).then(canvas=>{
+let a=document.createElement("a");
+a.download="NCPL_ID.png";
+a.href=canvas.toDataURL();
+a.click();
+});
 }
 
-function approve(i){
-approved.push(registrations[i]);
-registrations.splice(i,1);
-saveData();
-loadAdmin();
-loadApproved();
-updateCounter();
-}
-
-function reject(i){
-registrations.splice(i,1);
-saveData();
-loadAdmin();
-updateCounter();
-}
-
-function toggleEntry(){
-entryOpen = (localStorage.getItem("entryOpen")==="true")?"false":"true";
-localStorage.setItem("entryOpen",entryOpen);
-alert("Entry Status: "+entryOpen);
-}
-
-function updateResult(){
-let r=document.getElementById("resultInput").value;
-localStorage.setItem("result",r);
-document.getElementById("resultSection").innerText=r;
+function downloadPDF(){
+let {jsPDF}=window.jspdf;
+html2canvas(idCardDesign,{scale:3}).then(canvas=>{
+let img=canvas.toDataURL("image/png");
+let pdf=new jsPDF();
+pdf.addImage(img,"PNG",10,10,180,100);
+pdf.save("NCPL_ID.pdf");
+});
 }
 
 function downloadCSV(){
-let csv="Name,Age,Role,City,Mobile\n";
-registrations.forEach(p=>{
-csv+=`${p.name},${p.age},${p.role},${p.city},${p.mobile}\n`;
-});
+let csv="Name,Mobile,Status\n";
+data.forEach(p=>csv+=`${p.name},${p.mobile},${p.status}\n`);
 let blob=new Blob([csv],{type:"text/csv"});
 let a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
-a.download="registrations.csv";
+a.download="NCPL_Data.csv";
 a.click();
 }
 
-function resetData(){
-if(confirm("Are you sure?")){
-localStorage.clear();
-location.reload();
-}
+function toggleEntry(){
+entryOpen=!entryOpen;
+entryStatus.innerText=entryOpen?"Entries Open":"Entries Closed";
 }
 
-function closeAdmin(){
-document.getElementById("adminPanel").style.display="none";
+function resetAll(){
+localStorage.removeItem("ncplData");
+data=[];updateCounter();loadAdmin();
 }
 
-if(window.location.hash==="#admin2026"){
-let pass=prompt("Enter Admin Password");
-if(pass==="admin@123"){
-document.getElementById("adminPanel").style.display="block";
-loadAdmin();
-}else{
-alert("Wrong Password");
-window.location.href=window.location.pathname;
-}
+/* PUBLIC VERIFY */
+let params=new URLSearchParams(window.location.search);
+let verify=params.get("verify");
+if(verify){
+let p=data.find(x=>x.playerID===verify);
+document.body.innerHTML=p?
+`<div style="padding:50px;text-align:center">
+<h2>NCPL Verification</h2>
+<h3>${p.name}</h3>
+<p>Status: ${p.status}</p>
+</div>`
+:`<h2 style="color:red;text-align:center;padding:50px">Invalid / Fake ID</h2>`;
 }
 
-updateCounter();
-loadApproved();
-let savedResult=localStorage.getItem("result");
-if(savedResult){ document.getElementById("resultSection").innerText=savedResult; }
+function scrollToForm(){
+registerSection.scrollIntoView({behavior:"smooth"});
+}
 
 </script>
-
 </body>
   </html>
