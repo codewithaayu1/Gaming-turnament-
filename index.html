@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,28 +9,26 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
-body{background:linear-gradient(135deg,#0f172a,#020617);color:white;overflow-x:hidden}
+body{background:linear-gradient(135deg,#0f172a,#020617);color:white}
 section{padding:60px 8%}
 h1,h2{text-align:center}
-h2{margin-bottom:25px;color:#38bdf8}
-.card{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);
-border:1px solid rgba(255,255,255,0.1);padding:25px;border-radius:15px;margin-bottom:20px}
+.card{background:rgba(255,255,255,0.05);padding:20px;border-radius:15px;margin-bottom:20px}
 input,button{padding:10px;border-radius:8px;border:none;margin-top:8px}
 input{width:100%;background:#0f172a;border:1px solid #334155;color:white}
 button{background:#38bdf8;color:black;font-weight:600;cursor:pointer}
-.hidden{display:none}
-.hero{padding:120px 10%;text-align:center;background:radial-gradient(circle,#1e3a8a,#0f172a)}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:999}
-.close{position:absolute;top:20px;right:30px;font-size:28px;cursor:pointer}
-.badge{background:#16a34a;padding:4px 8px;border-radius:5px;font-size:12px}
+.hero{padding:100px 10%;text-align:center;background:radial-gradient(circle,#1e3a8a,#0f172a)}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);
+display:flex;justify-content:center;align-items:center;z-index:999}
+.hidden{display:none!important}
+.close{position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer}
+.badge{background:#16a34a;padding:5px 8px;border-radius:6px;font-size:12px}
 </style>
 </head>
 <body>
 
 <div class="hero">
-<h1>🏏 NORTHEAST CRICKET PREMIER LEAGUE (NCPL)</h1>
-<p>Official Cricket Trials Platform - 2026</p>
+<h1>🏏 NCPL 2026</h1>
+<p>Official Cricket Trials Platform</p>
 <button onclick="scrollToForm()">Register Now</button>
 </div>
 
@@ -58,7 +56,7 @@ background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:cente
 
 <button type="submit">Submit Registration</button>
 </form>
-<p id="formMsg" style="margin-top:15px;"></p>
+<p id="formMsg"></p>
 </div>
 </section>
 
@@ -76,7 +74,7 @@ background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:cente
 <div id="adminContent" class="hidden">
 <button onclick="toggleEntry()">Toggle Entry</button>
 <button onclick="downloadCSV()">Download CSV</button>
-<button onclick="resetAll()" style="background:red;color:white;">Reset All</button>
+<button onclick="resetAll()">Reset All</button>
 <div id="adminList"></div>
 </div>
 </div>
@@ -84,27 +82,22 @@ background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:cente
 
 <!-- ID CARD -->
 <div id="idCardModal" class="modal hidden">
-<div class="card" style="width:350px;text-align:center;position:relative;">
+<div class="card" style="width:320px;text-align:center;position:relative;">
 <span class="close" onclick="closeID()">×</span>
 
-<div id="idCardDesign" style="background:linear-gradient(135deg,#0f172a,#1e40af);
-border-radius:20px;padding:20px;position:relative;">
-
+<div id="idCardDesign" style="background:#1e40af;padding:20px;border-radius:20px;">
 <h3>🏏 NCPL 2026</h3>
-<img id="idPhoto" style="width:100px;height:100px;border-radius:50%;
-border:3px solid #38bdf8;object-fit:cover;">
+<img id="idPhoto" style="width:90px;height:90px;border-radius:50%;border:3px solid #38bdf8;object-fit:cover;">
 <h2 id="idName"></h2>
 <p id="idPlayerID"></p>
 <p id="idMobile"></p>
-
 <div id="verifiedBadge" class="badge hidden">✔ VERIFIED</div>
-<div id="qrCode" style="margin-top:10px;"></div>
+<div id="qrCode"></div>
 </div>
 
 <br>
-<button onclick="downloadID()">Download PNG</button>
+<button onclick="downloadPNG()">Download PNG</button>
 <button onclick="downloadPDF()">Download PDF</button>
-
 </div>
 </div>
 
@@ -117,12 +110,13 @@ border:3px solid #38bdf8;object-fit:cover;">
 let data = JSON.parse(localStorage.getItem("ncplData")) || [];
 let entryOpen = true;
 
-function updateCounter(){
-regCount.innerText = data.length;
+function saveData(){
 localStorage.setItem("ncplData", JSON.stringify(data));
+regCount.innerText = data.length;
 }
-updateCounter();
+saveData();
 
+/* PREVIEW */
 photo.onchange=e=>{
 let r=new FileReader();
 r.onload=()=>{photoPreview.src=r.result;photoPreview.style.display="block";}
@@ -135,14 +129,14 @@ r.onload=()=>{shotPreview.src=r.result;shotPreview.style.display="block";}
 r.readAsDataURL(e.target.files[0]);
 };
 
+/* REGISTER */
 regForm.onsubmit=e=>{
 e.preventDefault();
-
-if(!entryOpen){formMsg.innerHTML="Entries Closed";return;}
+if(!entryOpen){formMsg.innerText="Entries Closed";return;}
 
 let player={
 id:Date.now(),
-playerID:"NCPL2026-"+Math.floor(1000+Math.random()*9000),
+playerID:"NCPL-"+Math.floor(1000+Math.random()*9000),
 name:name.value,
 age:age.value,
 mobile:mobile.value,
@@ -153,14 +147,14 @@ verified:false
 };
 
 data.push(player);
-updateCounter();
-
+saveData();
 formMsg.innerHTML="<span style='color:lightgreen'>Registration Successful ✅</span>";
 regForm.reset();
 photoPreview.style.display="none";
 shotPreview.style.display="none";
 };
 
+/* ADMIN OPEN */
 if(window.location.hash==="#ncpladmin"){
 adminPanel.classList.remove("hidden");
 }
@@ -180,9 +174,9 @@ adminList.innerHTML="";
 data.forEach(p=>{
 adminList.innerHTML+=`
 <div class="card">
-<p><b>${p.name}</b> (${p.status})</p>
+<p><b>${p.name}</b> - ${p.status}</p>
 <button onclick="approve(${p.id})">Approve</button>
-<button onclick="openID(${p.id})">Open ID</button>
+<button onclick="showID(${p.id})">Open ID</button>
 </div>`;
 });
 }
@@ -196,25 +190,27 @@ window.open("https://wa.me/91"+p.mobile+"?text="+encodeURIComponent(msg));
 }
 return p;
 });
-updateCounter();loadAdmin();
+saveData();
+loadAdmin();
 }
 
-function openID(id){
+function showID(id){
 let p=data.find(x=>x.id===id);
+if(!p)return;
 idCardModal.classList.remove("hidden");
 idPhoto.src=p.photo;
 idName.innerText=p.name;
-idPlayerID.innerText="ID: "+p.playerID;
-idMobile.innerText="Mobile: "+p.mobile;
+idPlayerID.innerText=p.playerID;
+idMobile.innerText=p.mobile;
 
 qrCode.innerHTML="";
 let link=window.location.origin+window.location.pathname+"?verify="+p.playerID;
-new QRCode(qrCode,{text:link,width:90,height:90});
+new QRCode(qrCode,{text:link,width:80,height:80});
 }
 
 function closeID(){idCardModal.classList.add("hidden");}
 
-function downloadID(){
+function downloadPNG(){
 html2canvas(idCardDesign,{scale:3}).then(canvas=>{
 let a=document.createElement("a");
 a.download="NCPL_ID.png";
@@ -250,10 +246,17 @@ entryStatus.innerText=entryOpen?"Entries Open":"Entries Closed";
 
 function resetAll(){
 localStorage.removeItem("ncplData");
-data=[];updateCounter();loadAdmin();
+data=[];
+saveData();
+loadAdmin();
 }
 
-/* PUBLIC VERIFY */
+function scrollToForm(){
+registerSection.scrollIntoView({behavior:"smooth"});
+}
+
+/* SAFE VERIFY */
+window.addEventListener("DOMContentLoaded",function(){
 let params=new URLSearchParams(window.location.search);
 let verify=params.get("verify");
 if(verify){
@@ -266,11 +269,8 @@ document.body.innerHTML=p?
 </div>`
 :`<h2 style="color:red;text-align:center;padding:50px">Invalid / Fake ID</h2>`;
 }
-
-function scrollToForm(){
-registerSection.scrollIntoView({behavior:"smooth"});
-}
+});
 
 </script>
 </body>
-</html>
+  </html>
